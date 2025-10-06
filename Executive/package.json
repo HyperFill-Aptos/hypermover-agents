@@ -1,11 +1,11 @@
 {
   "name": "hypermover-executive",
   "version": "1.0.0",
-  "main": "dist/main.js",
+  "main": "dist/Executive/src/main.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/main.js",
+    "start": "node dist/Executive/src/main.js",
     "dev": "ts-node src/main.ts"
   },
   "dependencies": {
@@ -13,11 +13,13 @@
     "@aptos-labs/ts-sdk": "^1.39.0",
     "express": "^5.1.0",
     "nanoid": "^5.1.5",
-    "axios": "^1.11.0"
+    "axios": "^1.11.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.2.1",
+    "@types/minimatch": "^5.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }

@@ -49,17 +49,9 @@ llm = RetryingLLM(
 
 servers = [
     {
-        "url": "http://localhost:2000/mcp",
+        "url": "http://localhost:5000/mcp",
         "transport": "streamable-http",
-    },
-    {
-        "url": "http://localhost:3000/mcp",
-        "transport": "streamable-http",
-    },
-    {
-        "url": "http://localhost:4000/mcp",
-        "transport": "streamable-http",
-    },
+    }
 ]
 
 
@@ -68,13 +60,12 @@ pricer_adapter = None
 executive_adapter = None
 
 try:
-    analyzer_adapter = MCPServerAdapter([servers[0]])
-    pricer_adapter = MCPServerAdapter([servers[1]])
+    unified_adapter = MCPServerAdapter([servers[0]])
 
-    analyzer_tools = analyzer_adapter.tools
-    pricer_tools = pricer_adapter.tools
+    # Tools are combined: MarketAnalyzer + Pricer + Executive on one server
+    unified_tools = unified_adapter.tools
 
-    print(f"Market Analyzer tools available: {[tool.name for tool in analyzer_tools]}")
+    print(f"Unified tools available: {[tool.name for tool in unified_tools]}")
 
     market_researcher = Agent(
         role="Senior Market Research and Analysis Specialist",
@@ -87,7 +78,7 @@ try:
         liquidiy and profit from spread, bid/ask. Your research forms the
         foundation for trading strategies and investment decisions. You have extensive knowledge of technical
         analysis, fundamental analysis, and quantitative methods for evaluating digital assets.""",
-        tools=analyzer_tools,
+        tools=unified_tools,
         verbose=False,
         llm=llm,
         max_iter=4,
@@ -106,7 +97,7 @@ try:
             then size buy and sell orders based on the vault balance and measured liquidity.
             You prioritize safe execution, balanced inventory,
             and profitable spread capture while observing risk limits and market impact.""",
-        tools=pricer_tools,
+        tools=unified_tools,
         verbose=False,
         llm=llm,
         max_iter=4,
@@ -124,6 +115,7 @@ try:
         the strategic decisions made by the research and pricing teams, ensuring proper asset
         management, bot deployment, and continuous monitoring of trading operations. You prioritize
         capital efficiency, risk management, and operational excellence.""",
+        tools=unified_tools,
         verbose=False,
         llm=llm,
         max_iter=6,
@@ -236,10 +228,8 @@ try:
 
 except Exception as e:
     print(f"Error in market making system: {e}")
-    print("Ensure all MCP servers are running:")
-    print("- Market Analyzer: localhost:2000")
-    print("- Pricer: localhost:3000")
-    print("- Executive: localhost:4000")
+    print("Ensure the Unified MCP server is running:")
+    print("- Unified: localhost:5000")
     import traceback
 
     traceback.print_exc()

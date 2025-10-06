@@ -23,8 +23,15 @@ export class AptosVaultExecutor {
     this.vaultAddress = config.vaultAddress;
     this.orderbookAddress = config.orderbookAddress;
 
-    const privateKey = new Ed25519PrivateKey(config.privateKey);
-    this.account = Account.fromPrivateKey({ privateKey });
+    const hasPrivateKey = typeof config.privateKey === "string" && config.privateKey.trim().length > 0;
+    if (hasPrivateKey) {
+      const privateKey = new Ed25519PrivateKey(config.privateKey);
+      this.account = Account.fromPrivateKey({ privateKey });
+    } else {
+      // Fallback to an ephemeral account for non-signing operations in dev
+      console.warn("[AptosVaultExecutor] No AGENT_PRIVATE_KEY provided. Using ephemeral account; signing ops will fail.");
+      this.account = Account.generate();
+    }
   }
 
   async moveFromVaultToWallet(amount: string): Promise<any> {
